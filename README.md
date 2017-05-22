@@ -7,5 +7,5 @@ This app permits the user to connect to their fireboard.io account and monitor t
 ## Build
 The Pebble SDK must be installed, as per https://developer.pebble.com/sdk/
 ## Run
-You must possess a valid account at https://www.fireboard.io/
+You must possess a valid account at https://www.fireboard.io/  
 The underlying API details are available at http://docs.fireboard.io/
