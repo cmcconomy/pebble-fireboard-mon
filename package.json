@@ -1,0 +1,46 @@
+{
+  "name": "fireboard-mon",
+  "author": "Craig McConomy",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "pebble-clay": "^1.0.4"
+  },
+  "pebble": {
+    "displayName": "Fireboard Monitor",
+    "uuid": "8d84d89c-557b-481a-b8ab-168e160abd0b",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "Config_Username",
+      "Config_Password",
+      
+      "Fireboard_Name",
+      "Fireboard_Connected",
+      "Fireboard_Channel_Name[6]",
+      "Fireboard_UpdatedAt",
+      
+      "Channel_Connected[6]",
+      "Channel_Temp[6]",
+      "Channel_UpdatedAt[6]"
+    ],
+    "resources": {
+      "media": []
+    },
+    "capabilities": [
+      "configurable"
+    ]
+  }
+}
