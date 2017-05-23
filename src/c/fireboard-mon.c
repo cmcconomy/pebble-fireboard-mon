@@ -43,8 +43,23 @@ static void prv_window_load(Window *window) {
     s_temp_readouts[i] = text_layer_create(GRect(leftEdge,topEdge,width,height));
     text_layer_set_text(s_temp_readouts[i], printChannel(&channel));
     text_layer_set_text_alignment(s_temp_readouts[i], GTextAlignmentLeft);
+    text_layer_set_font(s_temp_readouts[i],fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
     layer_add_child(window_layer, text_layer_get_layer(s_temp_readouts[i]));
   }
+}
+
+static void updateChannelData(DictionaryIterator *iter, void *context) {
+  for( int i=0; i<6; i++ ) {
+    Channel channel = channels[i];
+    channel.connected = (bool)(dict_find(iter, MESSAGE_KEY_Channel_Connected + i)->value->int16);
+    if( channel.connected ) {
+      channel.lastTemp = channel.thisTemp;
+      channel.thisTemp = (int)(dict_find(iter, MESSAGE_KEY_Channel_Temp + i)->value->int32);
+      channel.updatedAt = (char*)(dict_find(iter, MESSAGE_KEY_Channel_UpdatedAt + i)->value->cstring); 
+    }
+    text_layer_set_text(s_temp_readouts[i], printChannel(&channel));
+  }
+
 }
 
 static void prv_window_unload(Window *window) {
@@ -58,15 +73,33 @@ static void prv_data_init(void) {
     channels[i].id=i+1;
     char *defaultName = "Channel X";
     snprintf(channels[i].name, sizeof defaultName, "Channel %d", channels[i].id);
-    channels[i].lastTemp = 123.45;
-    channels[i].thisTemp = 543.21;
-    channels[i].connected = (i<3)?true:false;
+    channels[i].lastTemp = 0; 
+    channels[i].thisTemp = 0;
+    channels[i].connected = false;
   }
+}
+static void inbox_dropped_callback(AppMessageResult reason, void *context) {
+  // A message was received, but had to be dropped
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped. Reason: %d", (int)reason);
+}
+
+// Register to be notified about inbox dropped events
+
+static void prv_messaging_init(void) {
+  // Largest expected inbox and outbox message sizes
+  const uint32_t inbox_size = app_message_inbox_size_maximum(); 
+  const uint32_t outbox_size = APP_MESSAGE_OUTBOX_SIZE_MINIMUM;
+
+  // Open AppMessage
+  app_message_open(inbox_size, outbox_size);
+  app_message_register_inbox_dropped(inbox_dropped_callback);
 }
 
 static void prv_init(void) {
   s_window = window_create();
   prv_data_init();
+  prv_messaging_init();
+  app_message_register_inbox_received(updateChannelData);
 //  window_set_click_config_provider(s_window, prv_click_config_provider);
   window_set_window_handlers(s_window, (WindowHandlers) {
     .load = prv_window_load,

@@ -2,8 +2,8 @@
 #include "channel.h"
 
 char* printChannel(Channel* channel) {
-	int intPart = (int) channel->lastTemp;
-	int decPart = (int)(10.0*(channel->lastTemp - (float)intPart));
+	int intPart = channel->thisTemp/10;
+	int decPart = channel->thisTemp - intPart*10;
 
     int bufSize = sizeof("n: XXX.X");
 	char* text = malloc(bufSize);

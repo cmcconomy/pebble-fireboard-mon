@@ -67,15 +67,21 @@ function getTemps(uuid) {
       if(xhr.readyState === XMLHttpRequest.DONE) {
         if(xhr.status === 200) {
           console.log("Temp Response: " + xhr.responseText);
-          var temps = [];
+          var channels = [];
           for( let i=0; i<6; i++ ) {
-            temps[i] = new Channel(i);
+            channels[i] = new Channel(i);
           }
-          let response = JSON.parse(xhr.responseText);
-          for( let i=0; i<response.length; i++ ) {
-            console.log("Response " + i + ": " + JSON.stringify(response[i]));
+          let responses = JSON.parse(xhr.responseText);
+          for( let i=0; i<responses.length; i++ ) {
+            let response = responses[i];
+            let channelId = response.channel;
+            let channel = channels[channelId-1];
+            channel.isConnected = true;
+            channel.temp = response.temp*10; //we can only send int across the wire so this is in tenths of a degree.
+            channel.unit = response.degreetype;
+            channel.updatedAt = response.created;
           }
-          resolve(response);
+          resolve(channels);
         } else {
           reject({desc:"Failed to get temp for device " + uuid, status:xhr.status});
         }
@@ -87,8 +93,8 @@ function getTemps(uuid) {
   });
 }
 
-exports.login = login;
-exports.storeToken = storeToken;
-exports.storeUUID = storeUUID;
-exports.getFirstDevice = getFirstDevice;
-exports.getTemps = getTemps;
+module.exports.login = login;
+module.exports.storeToken = storeToken;
+module.exports.storeUUID = storeUUID;
+module.exports.getFirstDevice = getFirstDevice;
+module.exports.getTemps = getTemps;

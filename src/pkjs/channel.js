@@ -17,4 +17,4 @@ class Channel {
 
 Channel.TEMP_UNIT = {CELCIUS:1, FAHRENHEIT:2};
 
-exports = Channel;
+module.exports = Channel;
